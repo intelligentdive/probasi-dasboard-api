@@ -1,17 +1,13 @@
-from django.db import models
-
-# Create your models here.
-
-
-
+# authentication/models.py
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import Group, Permission  # Import Group and Permission
 from django.db import models
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email=None, phone_number=None, password=None):
         if not email and not phone_number:
             raise ValueError("Either email or phone_number must be set")
-        
+
         user = self.model(
             email=self.normalize_email(email) if email else None,
             phone_number=phone_number
@@ -32,6 +28,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=15, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    
+    # Specify related_name for groups and user_permissions
+    groups = models.ManyToManyField(Group, blank=True, related_name='custom_users')
+    user_permissions = models.ManyToManyField(Permission, blank=True, related_name='custom_users')
 
     objects = CustomUserManager()
 

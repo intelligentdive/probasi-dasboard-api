@@ -1,3 +1,4 @@
+# authentication/serializers.py
 from authentication.models import CustomUser
 from rest_framework import serializers
 
