@@ -11,3 +11,7 @@ class PhoneSignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['phone_number', 'password']
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
