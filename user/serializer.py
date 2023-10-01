@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from . import services
 from rest_framework import serializers
-from .models import User
+from .models import User,Profileinfo1
 
 
 class UserCreateSerializerphone(serializers.ModelSerializer):
@@ -46,3 +46,9 @@ class UserSerializer(serializers.Serializer):
         data = super().to_internal_value(data)
 
         return services.UserDataClass(**data)
+    
+
+class ProfileCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profileinfo1
+        fields = ('user_name', 'gender', 'date_of_birth')  # Include only the fields that users can provide when creating a profile

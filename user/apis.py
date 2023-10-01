@@ -6,7 +6,10 @@ from . import serializer as user_serializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from .serializer import UserCreateSerializerphone,UserCreateSerializeremail
+from .serializer import UserCreateSerializerphone,UserCreateSerializeremail,ProfileCreateSerializer
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from .models import Profileinfo1
 # class RegisterApi(views.APIView):
 #     def post(self, request):
 #         serializer = user_serializer.UserSerializer(data=request.data)
@@ -118,4 +121,22 @@ class UserCreateAPIViewemail(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
+
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_profile(request):
+    if request.method == 'POST':
+        # Ensure that the user does not already have a profile
+        if Profileinfo1.objects.filter(user=request.user).exists():
+            return Response({'detail': 'Profile already exists for this user.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = ProfileCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            # Create a new profile for the authenticated user
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)     
