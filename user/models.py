@@ -1,0 +1,80 @@
+from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
+class UserManager(BaseUserManager):
+    def create_user(
+        self,
+        first_name,
+        last_name,
+        email=None,
+        phone_number=None,
+        password=None,
+        is_active=True,
+        is_staff=False,
+        is_superuser=False,
+    ):
+        if not email and not phone_number:
+            raise ValueError("User must have an email or phone number")
+        if not first_name:
+            raise ValueError("User must have a first name")
+        if not last_name:
+            raise ValueError("User must have a last name")
+
+        user = self.model(
+            email=self.normalize_email(email) if email else None,
+            phone_number=phone_number,
+            first_name=first_name,
+            last_name=last_name,
+            is_active=is_active,
+            is_staff=is_staff,
+            is_superuser=is_superuser,
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, first_name, last_name, email, password):
+        user = self.create_user(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+           # phone_number=phone_number,
+            password=password,
+            is_staff=True,
+            is_superuser=True,
+        )
+        return user
+
+class User(AbstractBaseUser, PermissionsMixin):
+    first_name = models.CharField(verbose_name="First Name", max_length=255)
+    last_name = models.CharField(verbose_name="Last Name", max_length=255)
+    email = models.EmailField(
+        verbose_name="Email",
+        max_length=255,
+        unique=True,
+        blank=True,
+        null=True,
+    )
+    phone_number = models.CharField(
+       
+        max_length=15,
+        unique=True,
+        blank=True,
+        null=True,
+    )
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'email'# You can set it to 'phone_number' if you want to allow phone number as username
+    REQUIRED_FIELDS = ['first_name', 'last_name']
+
+    def get_username(self):
+        # This method returns the username used for authentication.
+        # You can modify this method to return email or phone_number based on your requirements.
+        return self.email or self.phone_number
+
+    def __str__(self):
+        return self.get_username()
+
