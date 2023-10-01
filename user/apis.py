@@ -6,10 +6,10 @@ from . import serializer as user_serializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from .serializer import UserCreateSerializerphone,UserCreateSerializeremail,ProfileCreateSerializer
+from .serializer import UserCreateSerializerphone,UserCreateSerializeremail,ProfileCreateSerializer,Profileloactionbd,Profileloactionabroad,Profileinfoexperience
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
-from .models import Profileinfo1
+from .models import Profileinfo1,Profileinfolocationbd,Profileinfolocationabroad,Profileinfoexperience
 # class RegisterApi(views.APIView):
 #     def post(self, request):
 #         serializer = user_serializer.UserSerializer(data=request.data)
@@ -32,7 +32,7 @@ class LoginApi(views.APIView):
             raise exceptions.AuthenticationFailed("Invalid Credentials")
 
         if not user.check_password(raw_password=password):
-            raise exceptions.AuthenticationFailed("Invalid Credentials")
+            raise exceptions.AuthenticationFailed("Invalid pasword Credentials")
 
         token = services.create_token(user_id=user.id)
 
@@ -126,10 +126,11 @@ class UserCreateAPIViewemail(APIView):
 
 
 
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def create_profile(request):
-    if request.method == 'POST':
+class CreateProfileAPIView(APIView):
+    authentication_classes = (authentication.CustomUserAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
         # Ensure that the user does not already have a profile
         if Profileinfo1.objects.filter(user=request.user).exists():
             return Response({'detail': 'Profile already exists for this user.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -139,4 +140,68 @@ def create_profile(request):
             # Create a new profile for the authenticated user
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+    
+
+
+
+
+
+# Subclass the base class for each specific profile creation view
+
+
+
+
+
+
+
+class ProfilelocationbdCreateAPIView(APIView):
+    authentication_classes = (authentication.CustomUserAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        # Ensure that the user does not already have a profile
+        if Profileinfolocationbd.objects.filter(user=request.user).exists():
+            return Response({'detail': 'Profile already exists for this user.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = Profileloactionbd(data=request.data)
+        if serializer.is_valid():
+            # Create a new profile for the authenticated user
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)     
+    
+
+class ProfilelocationabroadCreateAPIView(APIView):
+    authentication_classes = (authentication.CustomUserAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        # Ensure that the user does not already have a profile
+        if Profileinfolocationabroad.objects.filter(user=request.user).exists():
+            return Response({'detail': 'Profile already exists for this user.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = Profileloactionabroad(data=request.data)
+        if serializer.is_valid():
+            # Create a new profile for the authenticated user
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
+
+
+
+class ProfileinfoexperienceCreateAPIView(APIView):
+    authentication_classes = (authentication.CustomUserAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        # Ensure that the user does not already have a profile
+        if Profileinfoexperience.objects.filter(user=request.user).exists():
+            return Response({'detail': 'Profile already exists for this user.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = Profileinfoexperience(data=request.data)
+        if serializer.is_valid():
+            # Create a new profile for the authenticated user
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)          

@@ -48,7 +48,7 @@ def user_email_selector(email: str) -> "User":
 
 
 def user_phone_selector(phone_number: str) -> "User":
-    user = models.User.objects.filter(phone_number = phone_number).first()
+    user = models.User.objects.filter(phone_number=phone_number).first()
 
     return user
 

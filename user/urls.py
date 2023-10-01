@@ -10,4 +10,12 @@ urlpatterns = [
     path("loginphone/", apis.LoginApi1.as_view(), name="login"),
     path("me/", apis.UserApi.as_view(), name="me"),
     path("logout/", apis.LogoutApi.as_view(), name="logout"),
+
+    path('create-profile1/',apis.CreateProfileAPIView.as_view(), name='create_profile'),
+
+    path('profilelocationbd/',apis.ProfilelocationbdCreateAPIView.as_view(), name='locationbd'),
+    path('profilelocationabroad/',apis.ProfilelocationabroadCreateAPIView.as_view(), name='locationabroad'),
+    path('profileexperience/',apis.ProfileinfoexperienceCreateAPIView.as_view(), name='locationabroad'),
+    
+    
 ]

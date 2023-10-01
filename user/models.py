@@ -90,6 +90,42 @@ class Profileinfo1(models.Model):
 
     def __str__(self):
         return self.user.get_username()
+    
+
+
+
+class Profileinfolocationbd(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    District = models.CharField(max_length=255, blank=True, null=True)
+
+
+
+
+
+
+
+
+
+
+class Profileinfolocationabroad(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    countryname = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
+    duration = models.PositiveIntegerField(default=0,null=True)
+
+
+
+
+class Profileinfoexperience(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+    durationstay = models.PositiveIntegerField(default=0,null=True)   
+
+    industry = models.CharField(max_length=255, blank=True, null=True)
+    areaofexpertise = models.CharField(max_length=255, blank=True, null=True) 
+    durationstay = models.PositiveIntegerField(default=0,null=True) 
+
+     
 
 
 
