@@ -4,7 +4,7 @@ from . import models
 from .models import Profileinfo1, Profileinfolocationbd, Profileinfolocationabroad, Profileinfoexperience
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ("id", "first_name", "last_name")
+    list_display = ("id", "fullname")
 
 
 admin.site.register(models.User, UserAdmin)

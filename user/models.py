@@ -4,8 +4,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 class UserManager(BaseUserManager):
     def create_user(
         self,
-        first_name,
-        last_name,
+        fullname,
+      
         email=None,
         phone_number=None,
         password=None,
@@ -15,16 +15,14 @@ class UserManager(BaseUserManager):
     ):
         if not email and not phone_number:
             raise ValueError("User must have an email or phone number")
-        if not first_name:
-            raise ValueError("User must have a first name")
-        if not last_name:
-            raise ValueError("User must have a last name")
-
+        if not fullname:
+            raise ValueError("User must have a full name")
+       
         user = self.model(
             email=self.normalize_email(email) if email else None,
             phone_number=phone_number,
-            first_name=first_name,
-            last_name=last_name,
+            fullname=fullname,
+            
             is_active=is_active,
             is_staff=is_staff,
             is_superuser=is_superuser,
@@ -33,10 +31,10 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, first_name, last_name, email, password):
+    def create_superuser(self, fullname, email, password):
         user = self.create_user(
-            first_name=first_name,
-            last_name=last_name,
+            fullname==fullname,
+            
             email=email,
            # phone_number=phone_number,
             password=password,
@@ -46,8 +44,8 @@ class UserManager(BaseUserManager):
         return user
 
 class User(AbstractBaseUser, PermissionsMixin):
-    first_name = models.CharField(verbose_name="First Name", max_length=255)
-    last_name = models.CharField(verbose_name="Last Name", max_length=255)
+    fullname= models.CharField(verbose_name="fullname", max_length=255)
+    #last_name = models.CharField(verbose_name="Last Name", max_length=255)
     email = models.EmailField(
         verbose_name="Email",
         max_length=255,
@@ -68,7 +66,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'# You can set it to 'phone_number' if you want to allow phone number as username
-    REQUIRED_FIELDS = ['first_name', 'last_name']
+    REQUIRED_FIELDS = ['fullname']
 
     def get_username(self):
         # This method returns the username used for authentication.

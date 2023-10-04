@@ -8,7 +8,7 @@ from .models import User,Profileinfo1,Profileinfolocationbd,Profileinfolocationa
 class UserCreateSerializerphone(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'phone_number', 'password')
+        fields = ('fullname', 'phone_number', 'password')
         extra_kwargs = {
             'password': {'write_only': True},
         }
@@ -23,7 +23,7 @@ class UserCreateSerializerphone(serializers.ModelSerializer):
 class UserCreateSerializeremail(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'password')
+        fields = ('fullname', 'email', 'password')
         extra_kwargs = {
             'password': {'write_only': True},
         }
@@ -68,15 +68,11 @@ class Profileloactionabroad(serializers.ModelSerializer):
 
 
 
-class Profileloactionabroad(serializers.ModelSerializer):
-    class Meta:
-        model = Profileinfolocationabroad
-        fields = ('countryname','city','duration')      
 
 
 
 
-class Profileinfoexperience(serializers.ModelSerializer):
+class Profileinfoexperienceserializer(serializers.ModelSerializer):
     class Meta:
         model = Profileinfoexperience
         fields = ('durationstay','industry','areaofexpertise','durationstay')  
