@@ -1,4 +1,6 @@
-#!/home/alamin/Desktop/ch/probasi-dasboard-api/venv/bin/python3
+#!/bin/sh
+'''exec' "/home/alamin/Desktop/last check/probasi-dasboard-api/venv/bin/python3" "$0" "$@"
+' '''
 # -*- coding: utf-8 -*-
 import re
 import sys
