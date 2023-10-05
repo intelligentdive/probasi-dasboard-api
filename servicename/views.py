@@ -1,8 +1,15 @@
-# servicename/views.py
-from rest_framework import viewsets
-from .models import Task
-from .serializers import TaskSerializer
+from rest_framework import generics
+# from rest_framework import viewsets
+from .models import Service
+from .serializers import ServiceSerializer
 
-class TaskViewSet(viewsets.ModelViewSet):
-    queryset = Task.objects.all()
-    serializer_class = TaskSerializer
+# class ServiceViewSet(viewsets.ModelViewSet):
+#     queryset = Service.objects.all()
+#     serializer_class = ServiceSerializer
+class ServiceListCreateView(generics.ListCreateAPIView):
+    queryset = Service.objects.all()
+    serializer_class = ServiceSerializer
+
+class ServiceDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Service.objects.all()
+    serializer_class = ServiceSerializer
