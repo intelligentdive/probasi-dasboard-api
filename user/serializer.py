@@ -37,8 +37,8 @@ class UserCreateSerializeremail(serializers.ModelSerializer):
 
 class UserSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
-    first_name = serializers.CharField()
-    last_name = serializers.CharField()
+    fullname = serializers.CharField()
+   
     email = serializers.CharField()
     password = serializers.CharField(write_only=True)
 
