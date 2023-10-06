@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/home/alamin/Desktop/last check/probasi-dasboard-api/venv"
+VIRTUAL_ENV="/home/alamin/Desktop/Intelligentdive/probasi-dasboard-api/venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
