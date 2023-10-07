@@ -22,7 +22,7 @@ from .models import User
 
 
 class PostListCreateView(generics.ListCreateAPIView):
-    # serializer_class = PostSerializer
+    serializer_class = PostSerializer
     def get(self, request):
         authorization_header = request.headers.get('Authorization')
         if not authorization_header or not authorization_header.startswith('Bearer '):
@@ -43,9 +43,6 @@ class PostListCreateView(generics.ListCreateAPIView):
         if not user1:
             raise AuthenticationFailed('User not found!')
 
-        # profile = Post.objects.filter(user=user).first()
-
-        
         # You should import and use your profile serializer here
         serializer =  PostSerializer(data=request.data)
         if serializer.is_valid():
@@ -55,7 +52,7 @@ class PostListCreateView(generics.ListCreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
     
 
-        return Response(serializer.data)      
+        # return Response(serializer.data)      
 
 
 
