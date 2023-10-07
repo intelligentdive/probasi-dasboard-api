@@ -3,15 +3,26 @@ from rest_framework import generics
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .models import Post, Comment
+from user.models import User
 import jwt, datetime
 from rest_framework.authentication import TokenAuthentication
 from .serializers import PostSerializer, CommentSerializer
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework import views, response, exceptions, permissions
+
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import AuthenticationFailed
+from .models import User
+
 
 
 class PostListCreateView(generics.ListCreateAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
+    # serializer_class = PostSerializer
     def get(self, request):
         authorization_header = request.headers.get('Authorization')
         if not authorization_header or not authorization_header.startswith('Bearer '):
@@ -27,18 +38,22 @@ class PostListCreateView(generics.ListCreateAPIView):
         except jwt.DecodeError:
             raise AuthenticationFailed('JWT is invalid!')
 
-        user = Post.objects.filter(id=payload['id']).first()
+        user1 = User.objects.filter(id=payload['id']).first()
 
-        if not user:
+        if not user1:
             raise AuthenticationFailed('User not found!')
 
-        profile = Post.objects.filter(user=user).first()
+        # profile = Post.objects.filter(user=user).first()
 
-        if not profile:
-            raise AuthenticationFailed('Profile not found!')
-
+        
         # You should import and use your profile serializer here
-        serializer =  PostSerializer(profile)
+        serializer =  PostSerializer(data=request.data)
+        if serializer.is_valid():
+            # Create a new profile for the authenticated user
+            serializer.save(user=user1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+    
 
         return Response(serializer.data)      
 
@@ -81,9 +96,6 @@ class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class CommentListCreateView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
-    queryset = Comment.objects.all()
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     def get(self, request):
         authorization_header = request.headers.get('Authorization')
         if not authorization_header or not authorization_header.startswith('Bearer '):
@@ -117,10 +129,8 @@ class CommentListCreateView(generics.ListCreateAPIView):
 
 
 class CommentDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Comment.objects.all()
+    # queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     def get(self, request):
         authorization_header = request.headers.get('Authorization')
         if not authorization_header or not authorization_header.startswith('Bearer '):
