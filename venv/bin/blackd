@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/home/alamin/Desktop/last check/probasi-dasboard-api/venv/bin/python3" "$0" "$@"
+'''exec' "/home/alamin/Desktop/Porabashi /probasi-dasboard-api/venv/bin/python3" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re
