@@ -14,6 +14,10 @@ import jwt, datetime
 from rest_framework.exceptions import AuthenticationFailed
 from .models import User,Profileinfo1
 
+from django.conf import settings
+from django.core.mail import send_mail
+import random
+
 # class RegisterApi(views.APIView):
 #     def post(self, request):
 #         serializer = user_serializer.UserSerializer(data=request.data)
@@ -23,6 +27,49 @@ from .models import User,Profileinfo1
 #         serializer.instance = services.create_user(user_dc=data)
 
 #         return response.Response(data=serializer.data)
+
+
+# class LoginApi(views.APIView):
+#     def get(self, request):
+#         # email = request.data["email"]
+#         # password = request.data["password"]
+
+#         # user = services.user_email_selector(email=email)
+
+#         # if user is None:
+#         #     raise exceptions.AuthenticationFailed("Invalid Credentials")
+
+#         # if not user.check_password(raw_password=password):
+#         #     raise exceptions.AuthenticationFailed("Invalid pasword Credentials")
+
+#         # payload = {
+#         #     'id': user.id,
+#         #     'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+#         #     'iat': datetime.datetime.utcnow()
+#         # }
+
+#         # token = jwt.encode(payload, 'secret', algorithm='HS256')
+
+#         # response = Response()
+
+
+
+#         subject = 'welcome to GFG world'
+#         message = f'Hi , thank you for registering in geeksforgeeks.'
+#         email_from = settings.EMAIL_HOST_USER
+
+#         email_address = "ab.rohan462@gmail.com"
+#         email_tuple = (email_address,) 
+
+#         recipient_list =   email_tuple 
+#         send_mail( subject, message, email_from, recipient_list )
+
+#         #response.set_cookie(key='jwt', value=token, httponly=True)
+#         response.data = {
+#             'jwt': 1
+#         }
+#         return response
+    
 
 
 class LoginApi(views.APIView):
@@ -36,13 +83,17 @@ class LoginApi(views.APIView):
             raise exceptions.AuthenticationFailed("Invalid Credentials")
 
         if not user.check_password(raw_password=password):
-            raise exceptions.AuthenticationFailed("Invalid pasword Credentials")
+            raise exceptions.AuthenticationFailed("Invalid Credentials")
 
         payload = {
             'id': user.id,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
             'iat': datetime.datetime.utcnow()
         }
+
+
+
+        
 
         token = jwt.encode(payload, 'secret', algorithm='HS256')
 
@@ -52,7 +103,7 @@ class LoginApi(views.APIView):
         response.data = {
             'jwt': token
         }
-        return response
+        return response     
     
 
 class LoginApi1(views.APIView):
@@ -73,6 +124,10 @@ class LoginApi1(views.APIView):
             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
             'iat': datetime.datetime.utcnow()
         }
+
+
+
+        
 
         token = jwt.encode(payload, 'secret', algorithm='HS256')
 
@@ -307,7 +362,45 @@ class LogoutApi(views.APIView):
 
 
 
+class emailotp(views.APIView):
+    def post(self, request):
+        email = request.data["email"]
+        password = request.data["password"]
+        fullname= request.data["fullname"]
 
+        otp = str(random.randint(10000 , 99999))
+
+        payload = {
+            'fullname' :fullname,
+            'email' :email,
+            'password': password,
+             'otp' :otp ,
+             'email' :email,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=4),
+            'iat': datetime.datetime.utcnow()
+        }
+        #otp = str(random.randint(10000 , 99999))
+        token = jwt.encode(payload, 'secret', algorithm='HS256')
+
+        response = Response()
+
+
+
+        subject = 'welcome to GFG world'
+        message = f'Hi   otp is,{otp} thank you for registering in probashi'
+        email_from = settings.EMAIL_HOST_USER
+
+        email_address = email
+        email_tuple = (email_address,) 
+
+        recipient_list =   email_tuple 
+        send_mail( subject, message, email_from, recipient_list )
+
+        #response.set_cookie(key='jwt', value=token, httponly=True)
+        response.data = {
+            'jwt': token
+        }
+        return response
 
 
 
@@ -326,13 +419,44 @@ class UserCreateAPIViewphone(APIView):
 
 class UserCreateAPIViewemail(APIView):
     def post(self, request, format=None):
-        serializer = UserCreateSerializeremail(data=request.data)
+        otp_phone = request.data["otp"]
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1].strip()  # Strip whitespaces
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        email = payload.get('email')
+        password = payload.get('password')
+        fullname = payload.get('fullname')
+        saved_otp = payload.get('otp')  # Get the OTP from the payload
+
+        # Check if the provided OTP matches the saved OTP
+        if otp_phone != saved_otp:
+            raise AuthenticationFailed('OTP does not match!')
+
+        # Hash the password before saving it
+        serializer = UserCreateSerializeremail(data={'email': email, 'password': password, 'fullname': fullname})
 
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            # Save the user object after validation
+            user = serializer.save()
+            return Response({'message': 'User created successfully.'}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
+
+
+
 
 
 
