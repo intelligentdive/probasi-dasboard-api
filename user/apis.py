@@ -80,14 +80,14 @@ class LoginApi(views.APIView):
         user = services.user_email_selector(email=email)
 
         if user is None:
-            raise exceptions.AuthenticationFailed("Invalid Credentials")
+            raise exceptions.AuthenticationFailed("not found email")
 
         if not user.check_password(raw_password=password):
-            raise exceptions.AuthenticationFailed("Invalid Credentials")
+            raise exceptions.AuthenticationFailed("Invalid password")
 
         payload = {
             'id': user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=100000),
             'iat': datetime.datetime.utcnow()
         }
 
@@ -114,14 +114,14 @@ class LoginApi1(views.APIView):
         user = services.user_phone_selector(phone_number=phone_number)
 
         if user is None:
-            raise exceptions.AuthenticationFailed("Invalid Credentials")
+            raise exceptions.AuthenticationFailed("Invalid phone")
 
         if not user.check_password(raw_password=password):
             raise exceptions.AuthenticationFailed("Invalid Credentials")
 
         payload = {
             'id': user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=100000),
             'iat': datetime.datetime.utcnow()
         }
 
