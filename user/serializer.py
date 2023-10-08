@@ -51,7 +51,7 @@ class UserSerializer(serializers.Serializer):
 class ProfileCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profileinfo1
-        fields = ('user_name', 'gender', 'date_of_birth')  # Include only the fields that users can provide when creating a profile
+        fields = ('user_name', 'gender', 'date_of_birth','fullname')  # Include only the fields that users can provide when creating a profile
 
 
 class Profileloactionbd(serializers.ModelSerializer):

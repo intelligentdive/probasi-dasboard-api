@@ -81,7 +81,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Profileinfo1(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    user_name = models.CharField(max_length=255, blank=True, null=True)
+    fullname = models.CharField(max_length=255, blank=True, null=True)
     user_name = models.CharField(max_length=255, blank=True, null=True)
     gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')], blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
