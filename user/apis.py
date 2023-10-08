@@ -335,13 +335,13 @@ class viewProfileinfoexperienceCreateAPIView(views.APIView):
         if not user:
             raise AuthenticationFailed('User not found!')
 
-        profile = Profileinfolocationabroad.objects.filter(user=user).first()
+        profile = Profileinfoexperience.objects.filter(user=user).first()
 
         if not profile:
             raise AuthenticationFailed('Profile not found!')
 
         # You should import and use your profile serializer here
-        serializer =  Profileloactionabroad(profile)
+        serializer =  Profileinfoexperienceserializer(profile)
 
         return Response(serializer.data)      
 
@@ -494,10 +494,10 @@ class CreateProfileAPIView(views.APIView):
 
 
 
-        if Profileinfoexperience.objects.filter(user=user1).exists():
+        if Profileinfo1.objects.filter(user=user1).exists():
             return Response({'detail': 'Profile already exists for this user.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = Profileinfoexperienceserializer(data=request.data)
+        serializer = ProfileCreateSerializer(data=request.data)
         if serializer.is_valid():
             # Create a new profile for the authenticated user
             serializer.save(user=user1)
