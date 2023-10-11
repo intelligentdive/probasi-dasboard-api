@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     "user",
     "status",
     "servicename",
-    'blog'
+    'blog',
+    'oversea_recruitment',
     
 ]
 
