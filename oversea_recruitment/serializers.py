@@ -14,7 +14,7 @@ class AppointmenttimeSerializer(serializers.ModelSerializer):
 
 
 class GenerateAppointmentSlotsSerializer(serializers.Serializer):
-    company = serializers.IntegerField()
+    companyid = serializers.IntegerField()
     date = serializers.DateField()
     num_appointments = serializers.IntegerField()
     interval_minutes = serializers.IntegerField()

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from datetime import datetime, timedelta
+
 from rest_framework.views import APIView
 from rest_framework.exceptions import AuthenticationFailed
 # Create your views here.
@@ -8,11 +8,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Service_Company,Appointmenttime
 from .serializers import ServicecompanySerializer,AppointmenttimeSerializer
-from datetime import timedelta
+
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
-from datetime import timedelta
+
 from .models import Service_Company, Appointmenttime,Appointment,Subservice  # Import your models
 from .serializers import GenerateAppointmentSlotsSerializer,AppointmentSerializer,ServiceCompanySerializer
 from .serializers import SubserviceSerializer
@@ -23,6 +23,7 @@ from django.db.models import Q
 
 from rest_framework import views, response, exceptions, permissions
 
+from datetime import datetime,timedelta
 
 
 from rest_framework.response import Response
@@ -32,7 +33,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 #from .models import Profileinfo1,Profileinfolocationbd,Profileinfolocationabroad,Profileinfoexperience
-import jwt, datetime
+import jwt
 from rest_framework.exceptions import AuthenticationFailed
 from user.models import User
 
@@ -66,7 +67,13 @@ class GenerateAppointmentSlotsView(generics.CreateAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        start_time = datetime.strptime(start_time_input, '%H:%M')  # Convert a string input to a datetime
+        try:
+            start_time = datetime.strptime(start_time_input, '%H:%M')
+        except ValueError:
+            return Response(
+                {'error': 'Invalid start_time format. It should be in the format HH:MM'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         # Calculate the end time based on the interval duration
         end_time = start_time + timedelta(minutes=num_appointments * interval_minutes)
@@ -96,7 +103,6 @@ class GenerateAppointmentSlotsView(generics.CreateAPIView):
             {'message': f'{len(appointment_slots)} slots generated successfully'},
             status=status.HTTP_201_CREATED
         )
-
 
 
 
@@ -240,7 +246,7 @@ class SubserviceListViewuser(views.APIView):
         except jwt.DecodeError:
             raise AuthenticationFailed('JWT is invalid!')
 
-        user = User.objects.filter(id=payload['id']).first()
+        user = User.objects.filter(id=payload['id'])
 
         if not user:
             raise AuthenticationFailed('User not found!')
@@ -251,7 +257,7 @@ class SubserviceListViewuser(views.APIView):
             raise AuthenticationFailed('Profile not found!')
 
         # You should import and use your profile serializer here
-        serializer = SubserviceSerializer(profile)
+        serializer = SubserviceSerializer(profile,many= True)
 
         return Response(serializer.data)   
     
@@ -387,7 +393,7 @@ class ServiceCompanyListView(generics.ListAPIView):
         region = request_data.get('region', None)
         subservice_id = request_data.get('subserviceid', None)
         name1 = request_data.get('companyname', None)
-        print(country)
+        
 
         # Create an empty Q object to combine the filter conditions
         combined_filter = Q()
@@ -493,7 +499,8 @@ class AppointmentListViewCompany(views.APIView):
 
     def get(self, request):
         # Retrieve the companyid from the request parameters or query parameters
-        company_id = self.request.query_params.get('companyid', None)
+        data = self.request.data
+        company_id = data.get('companyid', None)
 
         if company_id is not None:
             # Assuming you have a Service_Company model with an 'id' field
