@@ -1,9 +1,10 @@
 from django.urls import path
-from .views import GenerateAppointmentSlotsView,CreateAppointmentView,SubserviceCreateView,SubserviceListView,ServiceCompanyListView,AppointmenttimeListView,SubserviceListViewuser,serviceCreateView,serviceListView,serviceListViewuser,appointmentListViewuser,AppointmentListViewCompany,subservicelistcategory
+from .views import GenerateAppointmentSlotsView,CreateAppointmentView,SubserviceCreateView,SubserviceListView,ServiceCompanyListView,AppointmenttimeListView,SubserviceListViewuser,serviceCreateView,serviceListView,serviceListViewuser,appointmentListViewuser,AppointmentListViewCompany,subservicelistcategory,AppointmentcreatetimeViewSet
 
 urlpatterns = [
     # Other URL patterns
-    path('generate-appointments/', GenerateAppointmentSlotsView.as_view(), name='generate-appointments'),
+    path('generate-appointmentsautomate/', GenerateAppointmentSlotsView.as_view(), name='generate-appointments'),
+    path('createapointmenttime/', AppointmentcreatetimeViewSet.as_view({'get': 'list', 'post': 'create'}), name='generate-appointments'),
     path('create-appointment/', CreateAppointmentView.as_view(), name='create-appointment'),
     path('appointmentlistuser/', appointmentListViewuser.as_view(), name='create-appointment'),
     path('appointmentlistcompany/', AppointmentListViewCompany.as_view(), name='create-appointment'),

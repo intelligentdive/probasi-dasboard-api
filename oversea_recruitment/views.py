@@ -16,7 +16,7 @@ from datetime import timedelta
 from .models import Service_Company, Appointmenttime,Appointment,Subservice  # Import your models
 from .serializers import GenerateAppointmentSlotsSerializer,AppointmentSerializer,ServiceCompanySerializer
 from .serializers import SubserviceSerializer
-
+from rest_framework import viewsets
 from rest_framework import filters
 from django.db.models import Q
 
@@ -506,3 +506,21 @@ class AppointmentListViewCompany(views.APIView):
                 return Response({"error": "Company not found"}, status=404)
         else:
             return Response({"error": "Missing 'companyid' parameter"}, status=400)
+        
+
+
+
+       
+
+
+
+class AppointmentcreatetimeViewSet(viewsets.ModelViewSet):
+    queryset = Appointmenttime.objects.all()
+    serializer_class = AppointmenttimeSerializer  
+
+    # Create a new instance of YourModel
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
