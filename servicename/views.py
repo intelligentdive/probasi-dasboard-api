@@ -14,3 +14,7 @@ class ServiceCreateView(generics.CreateAPIView):
 class ServiceListView(generics.ListAPIView):
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
+
+
+
+    

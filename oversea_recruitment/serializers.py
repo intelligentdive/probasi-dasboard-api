@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Service_Company,Appointmenttime,Appointment
+from .models import Service_Company,Appointmenttime,Appointment,Subservice,Service_Company
 
 class ServicecompanySerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,3 +28,16 @@ class AppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
         fields = '__all__'
+
+
+class SubserviceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subservice
+        fields = '__all__'       
+
+
+
+class ServiceCompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service_Company
+        fields = '__all__'        

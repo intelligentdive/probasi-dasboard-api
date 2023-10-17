@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from datetime import datetime, timedelta
-
+from rest_framework.views import APIView
+from rest_framework.exceptions import AuthenticationFailed
 # Create your views here.
 from rest_framework import generics
 from rest_framework.response import Response
@@ -12,9 +13,32 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from datetime import timedelta
-from .models import Service_Company, Appointmenttime,Appointment  # Import your models
-from .serializers import GenerateAppointmentSlotsSerializer,AppointmentSerializer
+from .models import Service_Company, Appointmenttime,Appointment,Subservice  # Import your models
+from .serializers import GenerateAppointmentSlotsSerializer,AppointmentSerializer,ServiceCompanySerializer
+from .serializers import SubserviceSerializer
 
+from rest_framework import filters
+from django.db.models import Q
+
+
+from rest_framework import views, response, exceptions, permissions
+
+
+
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
+#from .serializer import UserCreateSerializerphone,UserCreateSerializeremail,ProfileCreateSerializer,Profileloactionbd,Profileloactionabroad,Profileinfoexperienceserializer
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+#from .models import Profileinfo1,Profileinfolocationbd,Profileinfolocationabroad,Profileinfoexperience
+import jwt, datetime
+from rest_framework.exceptions import AuthenticationFailed
+from user.models import User
+
+from django.conf import settings
+from django.core.mail import send_mail
+import random
 
 class GenerateAppointmentSlotsView(generics.CreateAPIView):
     serializer_class = GenerateAppointmentSlotsSerializer
@@ -25,7 +49,7 @@ class GenerateAppointmentSlotsView(generics.CreateAPIView):
 
         validated_data = serializer.validated_data
 
-        company_id = validated_data.get('company')
+        company_id = validated_data.get('companyid')
         date = validated_data.get('date')
         num_appointments = validated_data.get('num_appointments')
         interval_minutes = validated_data.get('interval_minutes')
@@ -79,7 +103,19 @@ class GenerateAppointmentSlotsView(generics.CreateAPIView):
 class CreateAppointmentView(generics.CreateAPIView):
     serializer_class = AppointmentSerializer
 
-    def create(self, request, *args, **kwargs):
+    # def create(self, request, *args, **kwargs):
+    #     service_company_id = request.data.get('service_company')
+    #     appointment_time_id = request.data.get('appointment_time')
+       
+
+    #     service_company_id = Service_Company.objects.get(id=service_company_id)
+
+    #     appointment_time_id = Appointmenttime.objects.get(id=appointment_time_id)
+    #     appointment_time_id.available =False 
+    #     appointment_time_id.save()
+        # You may want to validate the existence of the service_company and appointment_time
+    def post(self, request):
+        # Ensure that the user does not already have a profile
         service_company_id = request.data.get('service_company')
         appointment_time_id = request.data.get('appointment_time')
        
@@ -89,19 +125,384 @@ class CreateAppointmentView(generics.CreateAPIView):
         appointment_time_id = Appointmenttime.objects.get(id=appointment_time_id)
         appointment_time_id.available =False 
         appointment_time_id.save()
-        # You may want to validate the existence of the service_company and appointment_time
+
+
+
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1]
+
+        if not token:
+            raise AuthenticationFailed('Invalid or missing token!')
+
         try:
-            appointment = Appointment.objects.create(
-                service_company=service_company_id,
-                appointment_time=appointment_time_id
-                # Add other fields as needed
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user1 = User.objects.filter(id=payload['id']).first()
+
+        if not user1:
+            raise AuthenticationFailed('User not found!')
+
+
+
+
+
+       
+
+        serializer =AppointmentSerializer(data=request.data)
+        if serializer.is_valid():
+            # Create a new profile for the authenticated user
+            serializer.save(user=user1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+#sub service start
+
+class SubserviceCreateView(views.APIView):
+    
+
+    def post(self, request):
+        # Ensure that the user does not already have a profile
+
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1]
+
+        if not token:
+            raise AuthenticationFailed('Invalid or missing token!')
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user1 = User.objects.filter(id=payload['id']).first()
+
+        if not user1:
+            raise AuthenticationFailed('User not found!')
+
+
+
+
+
+       
+
+        serializer =SubserviceSerializer(data=request.data)
+        if serializer.is_valid():
+            # Create a new profile for the authenticated user
+            serializer.save(user=user1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+
+class SubserviceListView(generics.ListAPIView):
+    queryset = Subservice.objects.all()
+    serializer_class = SubserviceSerializer
+
+
+
+class SubserviceListViewuser(views.APIView):
+
+    def get(self, request):
+        # Retrieve the JWT token from the Authorization header
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1].strip()  # Strip whitespaces
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user = User.objects.filter(id=payload['id']).first()
+
+        if not user:
+            raise AuthenticationFailed('User not found!')
+
+        profile =  Subservice.objects.filter(user=user).first()
+
+        if not profile:
+            raise AuthenticationFailed('Profile not found!')
+
+        # You should import and use your profile serializer here
+        serializer = SubserviceSerializer(profile)
+
+        return Response(serializer.data)   
+    
+
+
+class subservicelistcategory(views.APIView):
+
+    def get(self, request):
+        # Retrieve the JSON data from the request body
+        data = request.data
+        category1 = data.get('category', None)
+
+        if category1 is None:
+            return Response({'error': 'Category not provided in request data'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        appointments = Subservice.objects.filter(category=category1)
+        serializer = SubserviceSerializer(appointments, many=True)
+        return Response(serializer.data)
+           
+
+
+
+#subservice end
+
+#service start comapany
+
+class serviceCreateView(views.APIView):
+    
+
+    def post(self, request):
+        # Ensure that the user does not already have a profile
+
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1]
+
+        if not token:
+            raise AuthenticationFailed('Invalid or missing token!')
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user1 = User.objects.filter(id=payload['id']).first()
+
+        if not user1:
+            raise AuthenticationFailed('User not found!')
+
+
+
+
+
+       
+
+        serializer =ServiceCompanySerializer(data=request.data)
+        if serializer.is_valid():
+            # Create a new profile for the authenticated user
+            serializer.save(user=user1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+
+class serviceListView(generics.ListAPIView):
+    queryset = Service_Company.objects.all()
+    serializer_class = ServiceCompanySerializer
+
+
+
+class serviceListViewuser(views.APIView):
+
+    def get(self, request):
+        # Retrieve the JWT token from the Authorization header
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1].strip()  # Strip whitespaces
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user = User.objects.filter(id=payload['id']).first()
+
+        if not user:
+            raise AuthenticationFailed('User not found!')
+
+        profile =  Service_Company.objects.filter(user=user).first()
+
+        if not profile:
+            raise AuthenticationFailed('Profile not found!')
+
+        # You should import and use your profile serializer here
+        serializer = ServiceCompanySerializer(profile)
+
+        return Response(serializer.data)   
+
+#service end
+
+
+
+
+
+
+
+
+
+#filter
+class ServiceCompanyListView(generics.ListAPIView):
+    queryset = Subservice.objects.all()
+    serializer_class = ServiceCompanySerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['country', 'region', 'subserviceid', 'name']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+
+        request_data = self.request.data
+        country = request_data.get('country', None)
+        region = request_data.get('region', None)
+        subservice_id = request_data.get('subserviceid', None)
+        name1 = request_data.get('companyname', None)
+        print(country)
+
+        # Create an empty Q object to combine the filter conditions
+        combined_filter = Q()
+
+        if country:
+            combined_filter &= Q(country=country)
+
+        if region:
+            combined_filter &= Q(region=region)
+
+        if subservice_id:
+            combined_filter &= Q(id=subservice_id)
+
+       
+        # Apply the combined filter to the queryset
+        queryset = queryset.filter(combined_filter)
+        
+        
+        service_companies = Service_Company.objects.filter(subservice__in=queryset).distinct()
+        #service_companies=  service_companies.filter(name=name)
+# Add a filter by the 'name' field
+        if name1 :
+            service_companies=  service_companies.filter(name=name1)
+            
+
+
+        return service_companies 
+    
+
+
+
+
+
+class AppointmenttimeListView(generics.ListAPIView):
+    serializer_class = AppointmenttimeSerializer
+
+    def get_queryset(self):
+        data = self.request.data
+        service_company_id = data.get('service_company_id', None)
+        date = data.get('date', None)
+
+        queryset = Appointmenttime.objects.filter(available=True)
+
+        if service_company_id and date:
+            queryset = queryset.filter(
+                Q(service_company__id=service_company_id) &
+                Q(date=date)
             )
+        elif service_company_id:
+            queryset = queryset.filter(service_company__id=service_company_id)
+        elif date:
+            queryset = queryset.filter(date=date)
 
-          
-            return Response({'message': 'Appointment created successfully'}, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return queryset
+
+    def post(self, request, *args, **kwargs):
+        # Perform filtering based on the JSON data in the request body
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 
 
+class appointmentListViewuser(views.APIView):
+
+    def get(self, request):
+        # Retrieve the JWT token from the Authorization header
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1].strip()  # Strip whitespaces
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user = User.objects.filter(id=payload['id']).first()
+
+        if not user:
+            raise AuthenticationFailed('User not found!')
+
+        profile = Appointment.objects.filter(user=user)
+
+        
+
+        # You should import and use your profile serializer here
+        serializer = AppointmentSerializer(profile,many=True)
+
+        return Response(serializer.data)  
+
+
+
+
+
+class AppointmentListViewCompany(views.APIView):
+
+    def get(self, request):
+        # Retrieve the companyid from the request parameters or query parameters
+        company_id = self.request.query_params.get('companyid', None)
+
+        if company_id is not None:
+            # Assuming you have a Service_Company model with an 'id' field
+            try:
+                company = Service_Company.objects.get(id=company_id)
+                appointments = Appointment.objects.filter(company=company)
+                serializer = AppointmentSerializer(appointments, many=True)
+                return Response(serializer.data)
+            except Service_Company.DoesNotExist:
+                return Response({"error": "Company not found"}, status=404)
+        else:
+            return Response({"error": "Missing 'companyid' parameter"}, status=400)

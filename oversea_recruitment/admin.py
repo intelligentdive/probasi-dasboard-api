@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 from django.contrib import admin
 from django.contrib import admin
-from .models import Service_Company, Appointmenttime, Appointment
+from .models import Service_Company, Appointmenttime, Appointment,Subservice
 
 
 
@@ -19,3 +19,12 @@ class AppointmentTimeAdmin(admin.ModelAdmin):
 @admin.register(Appointment)
 class AppointmentAdmin(admin.ModelAdmin):
     list_display = ('service_company', 'appointment_time')
+
+
+
+
+class SubserviceAdmin(admin.ModelAdmin):
+    list_display = ('name', 'description')  # Define the fields to display in the admin list view
+
+admin.site.register(Subservice, SubserviceAdmin)
+
