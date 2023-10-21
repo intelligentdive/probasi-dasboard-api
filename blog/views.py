@@ -6,7 +6,7 @@ from .models import Post, Comment
 from user.models import User
 import jwt, datetime
 from rest_framework.authentication import TokenAuthentication
-from .serializers import PostSerializer, CommentSerializer
+from .serializers import PostSerializer, CommentSerializer,PostSerializer1
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import views, response, exceptions, permissions
 from rest_framework.exceptions import AuthenticationFailed, NotFound 
@@ -46,10 +46,11 @@ class PostListCreateView(views.APIView):
             raise AuthenticationFailed('User not found!')
 
         # You should import and use your profile serializer here
-        serializer =  PostSerializer(data=request.data)
+        serializer =  PostSerializer1(data=request.data)
         if serializer.is_valid():
             # Create a new profile for the authenticated user
             serializer.save(user=user1)
+            print(serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
     
@@ -233,10 +234,44 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class AllPostsView(generics.ListAPIView):
-    queryset = Post.objects.all()
     serializer_class = PostSerializer
 
+    def get(self, request):
+        # Retrieve the JWT token from the Authorization header
+        authorization_header = request.headers.get('Authorization')
 
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1].strip()  # Strip whitespaces
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user = User.objects.filter(id=payload['id']).first()
+
+        if not user:
+            raise AuthenticationFailed('User not found!')
+
+        # You might want to retrieve all posts for the user instead of just one profile
+        posts = Post.objects.filter()
+
+        # You should import and use your profile serializer here
+        serializer = PostSerializer(
+            posts,
+            many=True,
+            context={'request_user': user}  # Pass the user to the serializer context
+        )
+
+        return Response(serializer.data)
+ 
+
+ 
 
 
 

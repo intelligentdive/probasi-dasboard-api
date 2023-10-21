@@ -22,12 +22,19 @@ class Post(models.Model):
     like_count = models.PositiveIntegerField(default=0,blank= True,null= True )  # Field to store the like count
     dislike_count = models.PositiveIntegerField(default=0,blank= True,null= True) 
     comment_count = models.PositiveIntegerField(default=0) 
+    image = models.ImageField(upload_to='post_images/',blank= True,null= True) 
     def __str__(self):
         return self.title
     def update_like_dislike_counts(self):
         self.like_count = self.likes.count()
         self.dislike_count = self.dislikes.count()
         self.save()
+
+    def get_user_has_liked(self, post):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return post.likes.filter(pk=request.user.pk).exists()
+        return False    
 
 
      
