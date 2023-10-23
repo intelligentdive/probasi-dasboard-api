@@ -72,6 +72,13 @@ class identySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class identySerializer1(serializers.ModelSerializer):
+   
+    class Meta:
+        model = identyverification
+        fields = '__all__'        
+
+
 
 
 class categorySerializer(serializers.ModelSerializer):

@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Service_Company, Appointmenttime,Appointment,Subservice,categorylist  # Import your models
-from .serializers import GenerateAppointmentSlotsSerializer,AppointmentSerializer,ServiceCompanySerializer,identySerializer,categorySerializer
+from .serializers import GenerateAppointmentSlotsSerializer,AppointmentSerializer,ServiceCompanySerializer,identySerializer,categorySerializer,identySerializer1
 from .serializers import SubserviceSerializer
 from rest_framework import viewsets
 from rest_framework import filters
@@ -410,7 +410,7 @@ class identityCreateView(views.APIView):
 
        
 
-        serializer =identySerializer(data=request.data)
+        serializer =identySerializer1(data=request.data)
         if serializer.is_valid():
             # Create a new profile for the authenticated user
             serializer.save(user=user1)
