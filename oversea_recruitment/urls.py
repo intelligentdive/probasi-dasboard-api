@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import GenerateAppointmentSlotsView,CreateAppointmentView,SubserviceCreateView,SubserviceListView,ServiceCompanyListView,AppointmenttimeListView,SubserviceListViewuser,serviceCreateView,serviceListView,serviceListViewuser,appointmentListViewuser,AppointmentListViewCompany,subservicelistcategory,AppointmentcreatetimeViewSet,identityCreateView,identyViewuser,categorylistcreate,categorylistall
+from .views import GenerateAppointmentSlotsView,CreateAppointmentView,SubserviceCreateView,SubserviceListView,ServiceCompanyListView,AppointmenttimeListView,SubserviceListViewuser,serviceCreateView,serviceListView,serviceListViewuser,appointmentListViewuser,AppointmentListViewCompany,subservicelistcategory,AppointmentcreatetimeViewSet,identityCreateView,identyViewuser,categorylistcreate,categorylistall,identitylistcompany
 
 urlpatterns = [
     # Other URL patterns
@@ -25,7 +25,7 @@ urlpatterns = [
     path('identitycompanycreate/', identityCreateView.as_view(), name='subservice-create'),
    # path('servicescompanylistall/', serviceListView.as_view(), name='subservice-list'),
     path('identitycompanylistuser/', identyViewuser.as_view(), name='subservice-list'),
-
+    path('identitycompany/', identitylistcompany.as_view(), name='product-detail'),
 
      path('service-companiesfilter/', ServiceCompanyListView.as_view(), name='service-company-list'),
      path('appointmenttimeslist/', AppointmenttimeListView.as_view(), name='appointmenttime-list'),
@@ -34,4 +34,5 @@ urlpatterns = [
 
      path('categorylistcreate/', categorylistcreate.as_view(), name='product-list-create'),
      path('categorylistall/', categorylistall.as_view(), name='product-detail'),
+     
 ]

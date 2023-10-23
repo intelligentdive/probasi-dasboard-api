@@ -265,7 +265,7 @@ class SubserviceListViewuser(views.APIView):
 
 class subservicelistcategory(views.APIView):
 
-    def get(self, request):
+    def post(self, request):
         # Retrieve the JSON data from the request body
         data = request.data
         category1 = data.get('category', None)
@@ -475,7 +475,7 @@ class identyViewuser(views.APIView):
 
 
 #filter
-class ServiceCompanyListView(generics.ListAPIView):
+class ServiceCompanyListView(generics.ListCreateAPIView):
     queryset = Subservice.objects.all()
     serializer_class = ServiceCompanySerializer
     filter_backends = [filters.SearchFilter]
@@ -483,14 +483,16 @@ class ServiceCompanyListView(generics.ListAPIView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        
 
-        request_data = self.request.data
-        country = request_data.get('country', None)
-        region = request_data.get('region', None)
-        subservice_id = request_data.get('subserviceid', None)
-        name1 = request_data.get('companyname', None)
-        
+        # Perform the filtering based on GET request parameters here
+
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        country = request.data.get('country', None)
+        region = request.data.get('region', None)
+        subservice_id = request.data.get('subserviceid', None)
+        name1 = request.data.get('companyname', None)
 
         # Create an empty Q object to combine the filter conditions
         combined_filter = Q()
@@ -504,20 +506,25 @@ class ServiceCompanyListView(generics.ListAPIView):
         if subservice_id:
             combined_filter &= Q(id=subservice_id)
 
-       
         # Apply the combined filter to the queryset
-        queryset = queryset.filter(combined_filter)
-        
-        
+        queryset = Subservice.objects.filter(combined_filter)
+
+        # Fetch ServiceCompany instances related to the filtered Subservice objects
         service_companies = Service_Company.objects.filter(subservice__in=queryset).distinct()
-        #service_companies=  service_companies.filter(name=name)
-# Add a filter by the 'name' field
-        if name1 :
-            service_companies=  service_companies.filter(name=name1)
-            
+
+        # Add a filter by the 'name' field if provided in the request body
+        if name1:
+            service_companies = service_companies.filter(name=name1)
+
+        serializer = self.get_serializer(service_companies, many=True)
+        return Response(serializer.data)
 
 
-        return service_companies 
+
+
+
+
+
     
 
 
@@ -646,3 +653,21 @@ class categorylistall(generics.ListAPIView):
     queryset = categorylist.objects.all()
     serializer_class = categorySerializer
 
+
+
+
+
+
+class identitylistcompany(views.APIView):
+
+    def post(self, request):
+        # Retrieve the JSON data from the request body
+        data = request.data
+        comid = data.get('companyid', None)
+
+        if comid is None:
+            return Response({'error': 'Category not provided in request data'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        appointments =identyverification.objects.filter(service_company__id=comid)
+        serializer = identySerializer(appointments, many=True)
+        return Response(serializer.data)

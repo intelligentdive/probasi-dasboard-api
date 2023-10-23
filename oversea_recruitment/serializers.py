@@ -66,6 +66,7 @@ class ServicecompanySerializer(serializers.ModelSerializer):
 
 
 class identySerializer(serializers.ModelSerializer):
+    service_company = ServiceCompanySerializer()
     class Meta:
         model = identyverification
         fields = '__all__'
