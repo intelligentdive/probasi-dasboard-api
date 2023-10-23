@@ -6,13 +6,13 @@ from . import serializer as user_serializer
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from .serializer import UserCreateSerializerphone,UserCreateSerializeremail,ProfileCreateSerializer,Profileloactionbd,Profileloactionabroad,Profileinfoexperienceserializer
+from .serializer import UserCreateSerializerphone,UserCreateSerializeremail,ProfileCreateSerializer,Profileloactionbd,Profileloactionabroad,Profileinfoexperienceserializer,Profilecomplete1Serializer, Profilecomplete2Serializer, Profilecomplete3Serializer, Profilecomplete4Serializer, Profilecomplete5Serializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from .models import Profileinfo1,Profileinfolocationbd,Profileinfolocationabroad,Profileinfoexperience
 import jwt, datetime
 from rest_framework.exceptions import AuthenticationFailed
-from .models import User,Profileinfo1
+from .models import User,Profileinfo1, Profilecomplete1, Profilecomplete2, Profilecomplete3, Profilecomplete4, Profilecomplete5
 
 from django.conf import settings
 from django.core.mail import send_mail
@@ -494,10 +494,10 @@ class CreateProfileAPIView(views.APIView):
 
 
 
-        if Profileinfo1.objects.filter(user=user1).exists():
+        if Profilecomplete1.objects.filter(user=user1).exists():
             return Response({'detail': 'Profile already exists for this user.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = ProfileCreateSerializer(data=request.data)
+        serializer = Profilecomplete1Serializer(data=request.data)
         if serializer.is_valid():
             # Create a new profile for the authenticated user
             serializer.save(user=user1)
@@ -666,3 +666,477 @@ class ProfileinfoexperienceCreateAPIView(APIView):
             serializer.save(user=user1)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)          
+    
+
+
+
+
+
+
+class Profilecomplete1ListCreateView(views.APIView):
+
+    def post(self, request):
+        # Ensure that the user does not already have a profile
+
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1]
+
+        if not token:
+            raise AuthenticationFailed('Invalid or missing token!')
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user1 = User.objects.filter(id=payload['id']).first()
+
+        profile, created = Profilecomplete1.objects.get_or_create(user=user1)
+
+        if not created:
+            # If the profile already exists, update the values
+            serializer = Profilecomplete1Serializer(profile, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # If the profile was created (not already existing)
+        serializer = Profilecomplete1Serializer(data=request.data)
+        if serializer.is_valid():
+            # Create a new profile for the authenticated user
+            serializer.save(user=user1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+    
+    
+
+
+
+
+
+class viewprofilecomplete1(views.APIView):
+
+    def get(self, request):
+        # Retrieve the JWT token from the Authorization header
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1].strip()  # Strip whitespaces
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user = User.objects.filter(id=payload['id']).first()
+
+        if not user:
+            raise AuthenticationFailed('User not found!')
+
+        profile =  Profilecomplete1.objects.filter(user=user).all()
+
+        if not profile:
+            raise AuthenticationFailed('Profile not found!')
+
+        # You should import and use your profile serializer here
+        serializer = Profilecomplete1Serializer(profile,many=True)
+
+        return Response(serializer.data)   
+    
+
+
+
+
+
+
+
+
+class Profilecomplete2ListCreateView(views.APIView):
+
+    def post(self, request):
+        # Ensure that the user does not already have a profile
+
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1]
+
+        if not token:
+            raise AuthenticationFailed('Invalid or missing token!')
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user1 = User.objects.filter(id=payload['id']).first()
+
+        profile, created = Profilecomplete2.objects.get_or_create(user=user1)
+
+        if not created:
+            # If the profile already exists, update the values
+            serializer = Profilecomplete2Serializer(profile, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # If the profile was created (not already existing)
+        serializer = Profilecomplete2Serializer(data=request.data)
+        if serializer.is_valid():
+            # Create a new profile for the authenticated user
+            serializer.save(user=user1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+    
+    
+
+
+
+class viewprofilecomplete2(views.APIView):
+
+    def get(self, request):
+        # Retrieve the JWT token from the Authorization header
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1].strip()  # Strip whitespaces
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user = User.objects.filter(id=payload['id']).first()
+
+        if not user:
+            raise AuthenticationFailed('User not found!')
+
+        profile =  Profilecomplete2.objects.filter(user=user).all()
+
+        if not profile:
+            raise AuthenticationFailed('Profile not found!')
+
+        # You should import and use your profile serializer here
+        serializer = Profilecomplete2Serializer(profile,many=True)
+
+        return Response(serializer.data)   
+    
+
+
+
+
+
+class Profilecomplete3ListCreateView(views.APIView):
+
+    def post(self, request):
+        # Ensure that the user does not already have a profile
+
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1]
+
+        if not token:
+            raise AuthenticationFailed('Invalid or missing token!')
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user1 = User.objects.filter(id=payload['id']).first()
+
+        profile, created = Profilecomplete3.objects.get_or_create(user=user1)
+
+        if not created:
+            # If the profile already exists, update the values
+            serializer = Profilecomplete3Serializer(profile, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # If the profile was created (not already existing)
+        serializer = Profilecomplete3Serializer(data=request.data)
+        if serializer.is_valid():
+            # Create a new profile for the authenticated user
+            serializer.save(user=user1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+    
+    
+
+
+
+class viewprofilecomplete3(views.APIView):
+
+    def get(self, request):
+        # Retrieve the JWT token from the Authorization header
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1].strip()  # Strip whitespaces
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user = User.objects.filter(id=payload['id']).first()
+
+        if not user:
+            raise AuthenticationFailed('User not found!')
+
+        profile =  Profilecomplete3.objects.filter(user=user).all()
+
+        if not profile:
+            raise AuthenticationFailed('Profile not found!')
+
+        # You should import and use your profile serializer here
+        serializer = Profilecomplete3Serializer(profile,many=True)
+
+        return Response(serializer.data)   
+    
+
+
+
+
+
+
+
+
+class Profilecomplete4ListCreateView(views.APIView):
+
+    def post(self, request):
+        # Ensure that the user does not already have a profile
+
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1]
+
+        if not token:
+            raise AuthenticationFailed('Invalid or missing token!')
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user1 = User.objects.filter(id=payload['id']).first()
+
+        profile, created = Profilecomplete4.objects.get_or_create(user=user1)
+
+        if not created:
+            # If the profile already exists, update the values
+            serializer = Profilecomplete4Serializer(profile, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # If the profile was created (not already existing)
+        serializer = Profilecomplete4Serializer(data=request.data)
+        if serializer.is_valid():
+            # Create a new profile for the authenticated user
+            serializer.save(user=user1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+    
+    
+
+
+
+class viewprofilecomplete4(views.APIView):
+
+    def get(self, request):
+        # Retrieve the JWT token from the Authorization header
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1].strip()  # Strip whitespaces
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user = User.objects.filter(id=payload['id']).first()
+
+        if not user:
+            raise AuthenticationFailed('User not found!')
+
+        profile =  Profilecomplete4.objects.filter(user=user).all()
+
+        if not profile:
+            raise AuthenticationFailed('Profile not found!')
+
+        # You should import and use your profile serializer here
+        serializer = Profilecomplete4Serializer(profile,many=True)
+
+        return Response(serializer.data)  
+    
+
+
+
+
+
+class Profilecomplete5ListCreateView(views.APIView):
+
+    def post(self, request):
+        # Ensure that the user does not already have a profile
+
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1]
+
+        if not token:
+            raise AuthenticationFailed('Invalid or missing token!')
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user1 = User.objects.filter(id=payload['id']).first()
+
+        profile, created = Profilecomplete5.objects.get_or_create(user=user1)
+
+        if not created:
+            # If the profile already exists, update the values
+            serializer = Profilecomplete5Serializer(profile, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        # If the profile was created (not already existing)
+        serializer = Profilecomplete5Serializer(data=request.data)
+        if serializer.is_valid():
+            # Create a new profile for the authenticated user
+            serializer.save(user=user1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+    
+    
+
+
+
+class viewprofilecomplete5(views.APIView):
+
+    def get(self, request):
+        # Retrieve the JWT token from the Authorization header
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1].strip()  # Strip whitespaces
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user = User.objects.filter(id=payload['id']).first()
+
+        if not user:
+            raise AuthenticationFailed('User not found!')
+
+        profile =  Profilecomplete5.objects.filter(user=user).all()
+
+        if not profile:
+            raise AuthenticationFailed('Profile not found!')
+
+        # You should import and use your profile serializer here
+        serializer = Profilecomplete5Serializer(profile,many=True)
+
+        return Response(serializer.data)  
+
+    
+
+
+    
+    
+
+
+
+    
+    
+
+
+
+

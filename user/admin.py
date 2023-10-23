@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from . import models
-from .models import Profileinfo1, Profileinfolocationbd, Profileinfolocationabroad, Profileinfoexperience
+from .models import Profileinfo1, Profileinfolocationbd, Profileinfolocationabroad, Profileinfoexperience,Profilecomplete1, Profilecomplete2, Profilecomplete3, Profilecomplete4, Profilecomplete5
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ("id", "fullname")
@@ -26,3 +26,11 @@ class ProfileinfolocationabroadAdmin(admin.ModelAdmin):
 @admin.register(Profileinfoexperience)
 class ProfileinfoexperienceAdmin(admin.ModelAdmin):
     list_display = ('user', 'industry', 'areaofexpertise', 'durationstay')
+
+
+
+admin.site.register(Profilecomplete1)
+admin.site.register(Profilecomplete2)
+admin.site.register(Profilecomplete3)
+admin.site.register(Profilecomplete4)
+admin.site.register(Profilecomplete5)

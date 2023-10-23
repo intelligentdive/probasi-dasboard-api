@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from . import services
 from rest_framework import serializers
-from .models import User,Profileinfo1,Profileinfolocationbd,Profileinfolocationabroad,Profileinfoexperience
+from .models import User,Profileinfo1,Profileinfolocationbd,Profileinfolocationabroad,Profileinfoexperience,Profilecomplete1, Profilecomplete2, Profilecomplete3, Profilecomplete4, Profilecomplete5
 
 
 class UserCreateSerializerphone(serializers.ModelSerializer):
@@ -76,4 +76,35 @@ class Profileinfoexperienceserializer(serializers.ModelSerializer):
     class Meta:
         model = Profileinfoexperience
         fields = ('durationstay','industry','areaofexpertise','durationstay')  
+
+
+
+
+
+
+class Profilecomplete1Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profilecomplete1
+        exclude = ('user',)
+
+class Profilecomplete2Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profilecomplete2
+        exclude = ('user',)
+
+class Profilecomplete3Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profilecomplete3
+        exclude = ('user',)
+
+class Profilecomplete4Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profilecomplete4
+        exclude = ('user',)
+
+class Profilecomplete5Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profilecomplete5
+        exclude = ('user',)
+
 

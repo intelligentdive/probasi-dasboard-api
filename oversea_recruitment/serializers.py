@@ -1,10 +1,21 @@
 from rest_framework import serializers
-from .models import Service_Company,Appointmenttime,Appointment,Subservice,Service_Company
+from .models import Service_Company,Appointmenttime,Appointment,Subservice,Service_Company,identyverification,categorylist
 
 class ServicecompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Service_Company
         fields = '__all__'
+
+
+
+
+
+
+
+class ServicecompanySerializer1(serializers.ModelSerializer):
+    class Meta:
+        model = Service_Company
+        fields = ('user_name', 'gender', 'date_of_birth','fullname')         
 
 class AppointmenttimeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -41,3 +52,28 @@ class ServiceCompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Service_Company
         fields = '__all__'        
+
+
+
+class ServicecompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service_Company
+        fields = '__all__'
+
+
+
+        
+
+
+class identySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = identyverification
+        fields = '__all__'
+
+
+
+
+class categorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = categorylist
+        fields = '__all__'

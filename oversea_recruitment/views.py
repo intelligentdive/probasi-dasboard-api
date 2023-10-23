@@ -6,15 +6,15 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Service_Company,Appointmenttime
+from .models import Service_Company,Appointmenttime,identyverification
 from .serializers import ServicecompanySerializer,AppointmenttimeSerializer
 
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 
-from .models import Service_Company, Appointmenttime,Appointment,Subservice  # Import your models
-from .serializers import GenerateAppointmentSlotsSerializer,AppointmentSerializer,ServiceCompanySerializer
+from .models import Service_Company, Appointmenttime,Appointment,Subservice,categorylist  # Import your models
+from .serializers import GenerateAppointmentSlotsSerializer,AppointmentSerializer,ServiceCompanySerializer,identySerializer,categorySerializer
 from .serializers import SubserviceSerializer
 from rest_framework import viewsets
 from rest_framework import filters
@@ -373,6 +373,103 @@ class serviceListViewuser(views.APIView):
 
 
 
+#identity start comapany
+
+class identityCreateView(views.APIView):
+    
+
+    def post(self, request):
+        # Ensure that the user does not already have a profile
+
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1]
+
+        if not token:
+            raise AuthenticationFailed('Invalid or missing token!')
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user1 = User.objects.filter(id=payload['id']).first()
+
+        if not user1:
+            raise AuthenticationFailed('User not found!')
+
+
+
+
+
+       
+
+        serializer =identySerializer(data=request.data)
+        if serializer.is_valid():
+            # Create a new profile for the authenticated user
+            serializer.save(user=user1)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+
+
+
+
+
+class identyViewuser(views.APIView):
+
+    def get(self, request):
+        # Retrieve the JWT token from the Authorization header
+        authorization_header = request.headers.get('Authorization')
+
+        if not authorization_header or not authorization_header.startswith('Bearer '):
+            raise AuthenticationFailed('Invalid or missing Bearer token!')
+
+        token = authorization_header.split('Bearer ')[1].strip()  # Strip whitespaces
+
+        try:
+            # Make sure to use the same secret key that was used to encode the JWT
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed('JWT has expired!')
+        except jwt.DecodeError:
+            raise AuthenticationFailed('JWT is invalid!')
+
+        user = User.objects.filter(id=payload['id']).first()
+
+        if not user:
+            raise AuthenticationFailed('User not found!')
+
+        profile =  identyverification.objects.filter(user=user).all()
+
+        if not profile:
+            raise AuthenticationFailed('Profile not found!')
+
+        # You should import and use your profile serializer here
+        serializer = identySerializer(profile,many=True)
+
+        return Response(serializer.data)   
+    
+
+
+
+
+
+
+
+#identity end
+
+
+
+
+
+
 
 
 
@@ -526,8 +623,26 @@ class AppointmentcreatetimeViewSet(viewsets.ModelViewSet):
     serializer_class = AppointmenttimeSerializer  
 
     # Create a new instance of YourModel
+
+    
+
+
+
+
+
+class categorylistcreate(generics.ListCreateAPIView):
+    queryset = categorylist.objects.all()
+    serializer_class = categorySerializer
+    
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
+class categorylistall(generics.ListAPIView):
+    queryset = categorylist.objects.all()
+    serializer_class = categorySerializer
+

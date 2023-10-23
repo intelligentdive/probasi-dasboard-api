@@ -96,6 +96,15 @@ class Profileinfo1(models.Model):
 class Profileinfolocationbd(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     District = models.CharField(max_length=255, blank=True, null=True)
+  
+
+
+
+
+
+
+
+
 
 
 
@@ -124,7 +133,45 @@ class Profileinfoexperience(models.Model):
     areaofexpertise = models.CharField(max_length=255, blank=True, null=True) 
     durationstay = models.PositiveIntegerField(default=0,null=True) 
 
-     
+
+
+
+
+class Profilecomplete1(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE,blank=True,null=True)
+    type= models.CharField(max_length=255, blank=True, null=True)
+    Designation = models.CharField(max_length=255, blank=True, null=True)
+    companyname = models.CharField(max_length=255, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+
+
+
+class Profilecomplete2(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+    Designation = models.CharField(max_length=255, blank=True, null=True)
+    companyname = models.CharField(max_length=255, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    durationstart= models.CharField(max_length=255, blank=True, null=True)
+    durationend= models.CharField(max_length=255, blank=True, null=True)
+    responsibility= models.CharField(max_length=1000, blank=True, null=True)
+
+
+
+class Profilecomplete3(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+    Digree = models.CharField(max_length=255, blank=True, null=True)
+    
+ 
+    durationstart= models.CharField(max_length=255, blank=True, null=True)
+    durationend= models.CharField(max_length=255, blank=True, null=True)
+    educationalinstitute= models.CharField(max_length=1000, blank=True, null=True)   
+
+
+
+ 
+
 
 
 
@@ -132,3 +179,30 @@ class Profileinfoexperience(models.Model):
 
    
 
+
+
+
+class Profilecomplete4(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    
+    
+    permanent = models.BooleanField(default=True)
+    idverificationdocumenttype= models.CharField(max_length=255, blank=True, null=True)
+    photo = models.ImageField(upload_to='license/',blank= True,null= True) 
+    country= models.CharField(max_length=255, blank=True, null=True)
+    
+
+
+
+
+class Profilecomplete5(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    abountme= models.CharField(max_length=255, blank=True, null=True)
+    phone = models.CharField(max_length=255, blank=True, null=True)
+    whatsapp = models.CharField(max_length=255, blank=True, null=True)
+    imo = models.CharField(max_length=255, blank=True, null=True)
+    fblink = models.CharField(max_length=255, blank=True, null=True)
+    linkdin= models.CharField(max_length=255, blank=True, null=True)
+    
+    
+    
