@@ -50,7 +50,7 @@ class PostListCreateView(views.APIView):
         if serializer.is_valid():
             # Create a new profile for the authenticated user
             serializer.save(user=user1)
-            print(serializer.data)
+           
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
     
