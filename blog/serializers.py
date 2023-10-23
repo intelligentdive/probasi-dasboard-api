@@ -4,6 +4,7 @@ from rest_framework import serializers
 from .models import Post, Comment
 from user.serializer import UserSerializer
 class CommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
     class Meta:
         model = Comment
         fields = '__all__'
