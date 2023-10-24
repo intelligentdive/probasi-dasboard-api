@@ -494,10 +494,10 @@ class CreateProfileAPIView(views.APIView):
 
 
 
-        if Profilecomplete1.objects.filter(user=user1).exists():
+        if Profileinfo1.objects.filter(user=user1).exists():
             return Response({'detail': 'Profile already exists for this user.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = Profilecomplete1Serializer(data=request.data)
+        serializer = ProfileCreateSerializer(data=request.data)
         if serializer.is_valid():
             # Create a new profile for the authenticated user
             serializer.save(user=user1)

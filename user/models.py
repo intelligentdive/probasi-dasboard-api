@@ -85,6 +85,7 @@ class Profileinfo1(models.Model):
     user_name = models.CharField(max_length=255, blank=True, null=True)
     gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')], blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
+    profilephoto= models.ImageField(upload_to='profilephoto/',blank= True,null= True)
     # Add other additional fields for the profile here (e.g., profile_picture, bio, etc.)
 
     def __str__(self):
@@ -131,7 +132,7 @@ class Profileinfoexperience(models.Model):
 
     industry = models.CharField(max_length=255, blank=True, null=True)
     areaofexpertise = models.CharField(max_length=255, blank=True, null=True) 
-    durationstay = models.PositiveIntegerField(default=0,null=True) 
+    durationstayexperience = models.PositiveIntegerField(default=0,null=True) 
 
 
 
