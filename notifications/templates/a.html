@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Progressive Web Apps</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+       
+    </head>
+    <body>
+        <h1>Page 1</h1>
+        
+        <p>Nullam quis risus eget urna mollis ornare vel eu leo. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Donec sed odio dui. Donec sed odio dui. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
+  
+        <script>
+         var firebaseConfig =  {apiKey: "AIzaSyCA0Sq1k68fgZHb4E4Kr8FcTcYcqxO54WE",
+    authDomain: "probashi-fec05.firebaseapp.com",
+    projectId: "probashi-fec05",
+    storageBucket: "probashi-fec05.appspot.com",
+    messagingSenderId: "719020799409",
+    appId: "1:719020799409:web:e80e6cb91b724b08b6f990",
+    measurementId: "G-5J7HMHE77G"
+  };
+        
+          // Initialize Firebase
+          firebase.initializeApp(firebaseConfig);
+          const messaging = firebase.messaging();
+        </script>
+
+
+
+
+        <script>
+
+
+if (navigator.serviceWorker) {
+  // Register the SW
+  navigator.serviceWorker.register('/firebase-messaging-sw.js').then(function(registration){
+  }).catch(console.log);
+}
+
+
+// Notification support
+
+function showNotification() {
+  let notificationOptions = {
+    body: 'Some Notification information',
+    
+  }
+  let notif = new Notification('My New Notification', notificationOptions);
+
+  notif.onclick = () => {
+    console.log('Notification clicked');
+  }
+}
+
+if(window.Notification) {
+  if(Notification.permission === 'granted') {
+  } else if(Notification.permission !== 'denied') {
+    Notification.requestPermission(permission => {
+      if(permission === 'granted') {
+      }
+    })
+  }
+}
+
+messaging.getToken({ vapidKey: 'BMPOOobr9tC_SDEX6rUMOrNmH5ORe9rUX4xYpWtLPsFsxYIoj_Mr_OnJ9oci21bshg3K1tzpS7GYxNZ2vemlH_Q' }).then((currentToken) => {
+  if (currentToken) {
+    // Send the token to your server and update the UI if necessary
+    // ...
+    console.log(currentToken);
+    return currentToken;
+  } else {
+    // Show permission request UI
+    console.log('No registration token available. Request permission to generate one.');
+    // ...
+  }
+}).catch((err) => {
+  console.log('An error occurred while retrieving token. ', err);
+  // ...
+});
+
+messaging.onMessage(payload => {
+  console.log('Message received. ', payload);
+  // ...
+});
+
+
+
+
+        </script>
+    </body>
+</html>

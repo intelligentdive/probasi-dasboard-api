@@ -75,7 +75,7 @@ class Profileloactionabroad(serializers.ModelSerializer):
 class Profileinfoexperienceserializer(serializers.ModelSerializer):
     class Meta:
         model = Profileinfoexperience
-        fields = ('durationstay','industry','areaofexpertise','durationstay')  
+        fields = ('durationstay','industry','areaofexpertise','durationstay','durationstayexperience')  
 
 
 

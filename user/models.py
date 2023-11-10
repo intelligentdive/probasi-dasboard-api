@@ -62,7 +62,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-
+    fcm_token = models.CharField(max_length=255, blank=True, null=True)
     objects = UserManager()
 
     USERNAME_FIELD = 'email'# You can set it to 'phone_number' if you want to allow phone number as username

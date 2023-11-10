@@ -17,6 +17,8 @@ urlpatterns = [
     path('api/', include('servicename.urls')),
 
      path('api/', include('oversea_recruitment.urls')),
+     path('', include('notifications.urls')),
+    
 ]
 
 if settings.DEBUG:
